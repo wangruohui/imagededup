@@ -147,7 +147,11 @@ def load_image(
             return None
 
         else:
-            if img.mode != 'RGB':
+            if img.mode in ['LA']:
+                background = Image.new('RGBA', img.size, (124, 117, 104))
+                img = Image.alpha_composite(background, img.convert('RGBA'))
+                img = img.convert('RGB')
+            elif img.mode != 'RGB':
                 # convert to RGBA first to avoid warning
                 # we ignore alpha channel if available
                 img = img.convert('RGBA').convert('RGB')
@@ -158,4 +162,6 @@ def load_image(
 
     except Exception as e:
         logger.warning(f'Invalid image file {image_file}:\n{e}')
+        if "img" in globals() or "img" in locals():
+            img.close()
         return None
